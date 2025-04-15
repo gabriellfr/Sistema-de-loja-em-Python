@@ -1,0 +1,93 @@
+class Produto:
+    def __init__(self, nome, preco, quantidade):
+        self.nome = nome
+        self.preco = preco
+        self.quantidade = quantidade
+
+    def aplicar_desconto(self, percentual):
+        self.preco -= self.preco * (percentual / 100)
+
+    def reduzir_estoque(self, qtd):
+        if self.quantidade >= qtd:
+            self.quantidade -= qtd
+            return True
+        return False
+
+
+class Loja:
+    def __init__(self):
+        self.produtos = []
+        self.carrinho = []
+
+    def adicionar_produto(self, produto):
+        self.produtos.append(produto)
+
+    def listar_produtos(self):
+        for i, p in enumerate(self.produtos):
+            print(f"{i + 1}. {p.nome} - R${p.preco:.2f} (Estoque: {p.quantidade})")
+
+    def adicionar_ao_carrinho(self, indice, qtd):
+        if 0 <= indice < len(self.produtos):
+            produto = self.produtos[indice]
+            if produto.reduzir_estoque(qtd):
+                self.carrinho.append((produto, qtd))
+                print("Produto adicionado ao carrinho.")
+            else:
+                print("Estoque insuficiente.")
+        else:
+            print("Produto invalido.")
+
+    def simular_pagamento(self, forma_pagamento):
+        total = sum(p.preco * qtd for p, qtd in self.carrinho)
+        if forma_pagamento == "1":
+            total *= 0.9
+        elif forma_pagamento == "2":
+            pass
+        elif forma_pagamento == "3":
+            total *= 1.05
+        else:
+            print("Forma de pagamento invalida.")
+            return
+        print(f"Total a pagar: R${total:.2f}")
+        self.carrinho.clear()
+
+
+def menu():
+    loja = Loja()
+    loja.adicionar_produto(Produto("Camiseta", 50.0, 10))
+    loja.adicionar_produto(Produto("Calca", 80.0, 5))
+    loja.adicionar_produto(Produto("Tenis", 200.0, 3))
+
+    while True:
+        print("\n=== Menu da Loja ===")
+        print("1. Listar produtos")
+        print("2. Comprar produto")
+        print("3. Simular pagamento")
+        print("4. Sair")
+        opcao = input("Escolha uma opcao: ")
+
+        if opcao == "1":
+            loja.listar_produtos()
+        elif opcao == "2":
+            loja.listar_produtos()
+            try:
+                indice = int(input("Escolha o numero do produto: ")) - 1
+                qtd = int(input("Quantidade: "))
+                loja.adicionar_ao_carrinho(indice, qtd)
+            except:
+                print("Entrada invalida.")
+        elif opcao == "3":
+            print("Formas de pagamento:")
+            print("1. Dinheiro/Pix (10% de desconto)")
+            print("2. Cartao a vista (sem desconto)")
+            print("3. Cartao parcelado (5% de acrescimo)")
+            forma = input("Escolha a forma de pagamento: ")
+            loja.simular_pagamento(forma)
+        elif opcao == "4":
+            print("Saindo...")
+            break
+        else:
+            print("Opcao invalida.")
+
+
+menu()
